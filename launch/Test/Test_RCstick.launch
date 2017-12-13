@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <include file="$(find drogo)/launch/includes/pca9685_stick.launch.xml" />
+    <include file="$(find drogo)/launch/includes/arduino.launch.xml" />
+</launch>

@@ -1,0 +1,5 @@
+<launch>
+    <node name="pca9685_pub_stick" type="pca9685_lucky_stick" pkg="drogo" output="screen">
+        <param name = "port" value="/dev/i2c-0"/>
+    </node>
+</launch>

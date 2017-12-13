@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="use_rviz" default="true" />
+    <arg name="init_x" default="0.0" />
+    <arg name="init_y" default="0.0" />
+    <arg name="init_a" default="0.0" />
+
+    <!-- Map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find drogo)/map/507.yaml"/>
+
+    <!-- TF setting -->
+    <include file="$(find drogo)/launch/includes/tf.launch.xml" />
+
+    <!-- RPLidar -->
+	<include file="$(find drogo)/launch/includes/rplidar.launch.xml" />
+	
+	<!-- IMU -->
+    <include file="$(find drogo)/launch/includes/gy85.launch.xml" />
+
+    <!-- pca9685 motor -->
+    <include file="$(find drogo)/launch/includes/pca9685_nav.launch.xml"/>
+
+    <!--rf2o_Laser_Odometry-->
+    <include file="$(find drogo)/launch/includes/rf2o.launch.xml" />
+
+	<!-- Robot_Localization -->
+    <include file="$(find drogo)/launch/includes/ekf.launch.xml" />
+	
+	<!-- AMCL -->
+    <include file="$(find drogo)/launch/includes/amcl.launch.xml">
+        <arg name="init_x" value="$(arg init_x)"/>
+        <arg name="init_y" value="$(arg init_y)"/>
+        <arg name="init_a" value="$(arg init_a)"/>
+    </include>
+
+    <!-- Navstack -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base">
+        <!-- local planner -->
+        <!--        
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>  
+        <rosparam file="$(find hypha_racecar)/param/dwa_local_planner_params.yaml" command="load"/>
+        -->
+        <!-- costmap layers -->    
+        <rosparam file="$(find hypha_racecar)/param/local_costmap_params.yaml" command="load"/>
+        <rosparam file="$(find hypha_racecar)/param/global_costmap_params.yaml" command="load"/> 
+        <!-- move_base params -->
+        <rosparam file="$(find hypha_racecar)/param/move_base_params.yaml" command="load"/>
+        <remap from="/odom" to="/odometry/filtered"/>
+    </node>
+
+    <!-- pp controller -->  
+    <node pkg="drogo" type="pp_controller" respawn="false" name="pp_controller" output="screen">       
+        <!-- L1 -->
+        <param name="Vcmd" value="1.0" /> <!-- speed of car m/s -->        
+		<!--Vexp -->
+		<param name="Vexp" value="0.4" />
+		<!-- ESC -->
+		<!--Constant car speed, stop:1500 , minimum speed:1620 -->
+		<param name="baseSpeed" value="1620"/>
+        <!-- Servo -->
+        <param name="baseAngle" value="90.0"/> 
+        <param name="AngleGain" value="-3.5"/>		
+        <param name="GasGain" value="90.0"/> 		
+
+        <!-- remap from="/odometry/filtered" to="odom" / --> 
+        <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" /> 
+    </node>
+
+    <!-- Rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find drogo)/rviz_cfg/amcl.rviz" if="$(arg use_rviz)" />
+</launch>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="use_rviz" default="true"/>
+
+    <!-- TF setting -->
+    <include file="$(find drogo)/launch/includes/tf.launch.xml" />
+
+    <!-- RPLidar -->
+    <include file="$(find drogo)/launch/includes/rplidar.launch.xml" />
+
+    <!-- IMU -->
+    <include file="$(find drogo)/launch/includes/gy85.launch.xml" />
+
+    <!--rf2o_Laser_Odometry-->
+    <include file="$(find drogo)/launch/includes/rf2o.launch.xml" />
+
+	<!-- Robot_Localization -->
+    <include file="$(find drogo)/launch/includes/ekf.launch.xml" />
+
+	<!-- pca9685-->
+	<include file="$(find drogo)/launch/includes/pca9685_stick.launch.xml"/>
+
+	<!-- Arduino -->
+	<include file="$(find drogo)/launch/includes/arduino.launch.xml"/>
+	
+	<!-- Rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find drogo)/rviz_cfg/odom.rviz" if="$(arg use_rviz)"/>
+
+</launch>
+

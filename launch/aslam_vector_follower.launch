@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+
+<arg name="use_rviz" default="false" />
+  
+<!-- TF setting -->
+<include file="$(find drogo)/launch/includes/tf.launch.xml" />
+
+<!-- Rviz -->
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find drogo)/rviz_cfg/aslam_vector_follower.rviz" if="$(arg use_rviz)"/>
+
+<!-- RPLidar -->
+<include file="$(find drogo)/launch/includes/rplidar.launch.xml" />
+
+<!--Vector follower -->
+<node pkg="drogo" type="aslam_vector_follower" name="aslam_vector_follower" output="screen" >
+	<remap from="/car/cmd_vel" to="/fuse/cmd_vel_angular"/>	
+</node>
+
+<!--TF from map to odom -->
+<node pkg="tf" type="static_transform_publisher" name="map2odom" args="0 0 0 0 0 0.001 0 /map /odom 10"/>
+
+<!--pca9685 -->
+<include file="$(find drogo)/launch/includes/pca9685_nav.launch.xml"  />
+
+<!--cmd_vel fuser -->
+<node name="fuse_cmd_vel" type="fuse_cmd_vel" pkg="drogo" output="screen" />
+
+<!-- Arduino -->
+<include file="$(find drogo)/launch/includes/arduino.launch.xml"/>
+
+<!--rf2o_Laser_Odometry-->
+<include file="$(find drogo)/launch/includes/rf2o.launch.xml"/>
+
+<!-- Robot_Localization -->
+<include file="$(find drogo)/launch/includes/ekf.launch.xml"/>
+
+</launch>

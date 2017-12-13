@@ -1,0 +1,8 @@
+<launch>
+    <node name="imu_auto_lucky"   pkg="drogo"  type="imu_auto_lucky" output="screen">
+	    <param name="port"       value="/dev/i2c-1"/>
+        <param name="init_loop"  value="300"/>
+    	<param name="sRateHz"    value="100"/>
+    	<param name="imu_frame"  value="IMU_link"/>
+    </node>
+</launch>
